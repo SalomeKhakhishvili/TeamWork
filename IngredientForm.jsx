@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 
-const API_KEY = 'GnLX-OeliVaHuB42JXBSJIGQrAd-nXuZbE7k3TW0TACIcRw67w';
+const API_KEY = 'sKjBmGs3LCkGrtPWL5n9LbsMe4gXMYsWo6vWPFb8leMjHn2t_Q';
 
 const IngredientForm = () => {
   const [name, setName] = useState('');
