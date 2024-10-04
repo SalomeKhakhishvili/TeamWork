@@ -1,38 +1,61 @@
 import React, { useState } from 'react';
 import '../App.css';
 
- const API_KEY =  'GnLX-OeliVaHuB42JXBSJIGQrAd-nXuZbE7k3TW0TACIcRw67w'
+const API_KEY = 'GnLX-OeliVaHuB42JXBSJIGQrAd-nXuZbE7k3TW0TACIcRw67w';
 
-  const IngredientForm = () => {
+const IngredientForm = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState([]);
-  
 
-  const handleCreate = () => {
-    const newIngredient = { 
-      name: name.trim(), 
-      price: parseFloat(price),
-       description: description.trim()
-       };
-    const response = fetch('/api/v1/ingredients', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization" : `Bearer ${API_KEY}` 
-      },
-      body: JSON.stringify(newIngredient),
-    });
-    if (response.ok) {
-      const data = response.json();
+  const handleCreate = async (callback) => {
+    const parsedPrice = parseFloat(price);
+    
+  
+    if (isNaN(parsedPrice)) {
+      console.error('Price must be a valid number.');
+      return;
+    }
+
+    const newIngredient = {
+      name: name.trim(),
+      price: parsedPrice,
+      description: description.trim(),
+    };
+
+    try {
+      const response = await fetch('https://crudapi.co.uk/api/v1/ingredients', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify(newIngredient),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
       setIngredients([...ingredients, data]);
       setName('');
       setPrice('');
       setDescription('');
+
+      if (callback) {
+        callback(null, data);
+      }
+
+    } catch (error) {
+      console.error('Error during create ingredient:', error);
+
+      if (callback) {
+        callback(error, null);
+      }
     }
   };
-
 
   return (
     <div className="form-container">
@@ -43,6 +66,7 @@ import '../App.css';
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
+
       <div className="price-input-container">
         <span className="currency-symbol">₾</span>
         <input
@@ -60,7 +84,16 @@ import '../App.css';
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
-      <button className="button" onClick={handleCreate}>
+      <button 
+        className="button" 
+        onClick={() => handleCreate((error, data) => {
+          if (error) {
+            console.log('Failed to create ingredient:', error.message);
+          } else {
+            console.log('Ingredient created successfully:', data);
+          }
+        })}
+      >
         Create Ingredient
       </button>
     </div>
