@@ -43,8 +43,6 @@ import '../App.css';
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-
-      {/* Price input with Lari symbol */}
       <div className="price-input-container">
         <span className="currency-symbol">₾</span>
         <input
